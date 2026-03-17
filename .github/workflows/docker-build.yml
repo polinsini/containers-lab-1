@@ -2,11 +2,9 @@ name: Build and Push Docker Images
 
 on:
   push:
-    branches: [main, master]
-    tags:
-      - 'v*'
+    branches: [ main, master ]
   pull_request:
-    branches: [main, master]
+    branches: [ main, master ]
 
 env:
   REGISTRY: ghcr.io
@@ -27,61 +25,54 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Log in to GitHub Container Registry
-        if: github.event_name != 'pull_request'
+      - name: Log in to GHCR
         uses: docker/login-action@v3
         with:
-          registry: ${{ env.REGISTRY }}
+          registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.CR_PAT }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata for Go app
-        id: meta-go
+      - name: Extract metadata for app
+        id: meta-app
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/app
           tags: |
-            type=raw,value=latest,enable={{is_default_branch}}
-            type=ref,event=branch
-            type=ref,event=pr
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
             type=sha
 
-      - name: Build and push Go app
+      - name: Build and push app
         uses: docker/build-push-action@v5
         with:
           context: ./app
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta-go.outputs.tags }}
-          labels: ${{ steps.meta-go.outputs.labels }}
+          push: true
+          tags: ${{ steps.meta-app.outputs.tags }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Extract metadata for Nginx
+      - name: Extract metadata for nginx
         id: meta-nginx
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/nginx
           tags: |
-            type=raw,value=latest,enable={{is_default_branch}}
-            type=ref,event=branch
             type=sha
 
-      - name: Build and push Nginx
-        if: github.event_name != 'pull_request'
+      - name: Build and push nginx
         uses: docker/build-push-action@v5
         with:
           context: ./nginx
+          file: ./nginx/Dockerfile
           push: true
           tags: ${{ steps.meta-nginx.outputs.tags }}
-          labels: ${{ steps.meta-nginx.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Test the built images
+      - name: Test containers
         run: |
           docker compose -f docker-compose.test.yml up -d
-          sleep 30
-          curl -f http://localhost/api/health || exit 1
+          sleep 20
+          curl -f http://localhost || exit 1
           docker compose down
+        env:
+          IMAGE_NAME: ${{ github.repository }}
+          GIT_SHA: ${{ github.sha }}

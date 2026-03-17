@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nginx Test Page</title>
+<style>
+body {
+font-family: Arial, sans-serif;
+margin: 40px;
+background-color: #f4f4f4;
+text-align: center;
+}
+.container {
+background-color: white;
+border-radius: 10px;
+padding: 30px;
+max-width: 600px;
+margin: 0 auto;
+box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+h1 {
+color: #28a745;
+}
+.nginx-logo {
+font-size: 48px;
+margin: 20px 0;
+color: #009639;
+}
+.info {
+background-color: #e9ecef;
+border-radius: 5px;
+padding: 15px;
+margin: 20px 0;
+text-align: left;
+}
+.footer {
+margin-top: 30px;
+color: #666;
+font-size: 14px;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<div class="nginx-logo">🟢</div>
+
+<h1>SPV — группа 16</h1>
+
+<div class="info">
+<h3>Информация о сервере:</h3>
+<p><strong>Время на сервере:</strong> <span id="server-time"></span></p>
+<p><strong>IP-адрес сервера:</strong> <?php echo $_SERVER['SERVER_ADDR']; ?></p>
+<p><strong>Имя сервера:</strong> <?php echo gethostname(); ?></p>
+</div>
+
+<div class="footer">
+<p>Тестовая страница Nginx • Создано для проверки конфигурации</p>
+<p>📍 /usr/share/nginx/html/index.html</p>
+</div>
+
+</div>
+
+<script>
+document.getElementById('server-time').textContent = new Date().toLocaleString('ru-RU');
+</script>
+
+</body>
+</html>

@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+
   postgres:
     image: postgres:15-alpine
     container_name: lab1-postgres
@@ -16,7 +17,7 @@ services:
     networks:
       - app-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d myapp"]
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -39,7 +40,7 @@ services:
     networks:
       - app-network
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080/api/health"]
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/api/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3

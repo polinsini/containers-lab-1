@@ -78,6 +78,11 @@ jobs:
           labels: ${{ steps.meta-nginx.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          
+      - name: Set env vars for docker-compose
+        run: |
+          echo "IMAGE_NAME=${{ github.repository }}" >> $GITHUB_ENV
+          echo "GIT_SHA=${{ github.sha }}" >> $GITHUB_ENV
 
       - name: Test the built images
         run: |

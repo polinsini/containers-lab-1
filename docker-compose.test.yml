@@ -4,17 +4,27 @@ services:
     environment:
       POSTGRES_PASSWORD: secret
       POSTGRES_DB: myapp_test
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     networks:
       - test-network
 
   app:
     image: ghcr.io/${IMAGE_NAME}/app:sha-${GIT_SHA}
-    environment:
-      DB_HOST: postgres
-      DB_PASSWORD: secret
-      DB_NAME: myapp_test
-    depends_on:
-      - postgres
+app:
+  image: ghcr.io/${IMAGE_NAME}/app:sha-${GIT_SHA}
+  environment:
+    DB_HOST: postgres
+    DB_PORT: 5432
+    DB_USER: postgres
+    DB_PASSWORD: secret
+    DB_NAME: myapp_test
+  depends_on:
+    postgres:
+      condition: service_healthy
     networks:
       - test-network
 

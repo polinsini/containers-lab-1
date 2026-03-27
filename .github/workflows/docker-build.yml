@@ -78,9 +78,10 @@ jobs:
           labels: ${{ steps.meta-nginx.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
       - name: Test the built images
         run: |
+          export IMAGE_NAME=${{ github.repository }}
+          export GIT_SHA=${{ github.sha }}
           docker compose -f docker-compose.test.yml up -d
           sleep 30
           curl -f http://localhost/api/health || exit 1

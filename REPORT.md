@@ -6,7 +6,7 @@
 ### Работа с образами
 
 #### Поиск образов в Docker Hub
-
+```
 docker search nginx
 NAME                                     DESCRIPTION                                     STARS     OFFICIAL
 
@@ -59,9 +59,10 @@ circleci/nginx                           This image is for internal use         
 activestate/nginx                        ActiveState's customizable, low-to-no vulner…   0  
 
 docksal/nginx                            Nginx service image for Docksal                 1  
-
+```
 
 #### Скачивание образа
+```
 docker pull nginx:alpine
 
 alpine: Pulling from library/nginx
@@ -91,9 +92,11 @@ Digest: sha256:1d13701a5f9f3fb01aaa88cef2344d65b6b5bf6b7d9fa4cf0dca557a8d7702ba
 Status: Downloaded newer image for nginx:alpine
 
 docker.io/library/nginx:alpine
-
+```
 
 #### Просмотр локальных образов
+
+```
 docker images
                                                i Info →   U  In Use
 
@@ -101,9 +104,11 @@ IMAGE          ID             DISK USAGE   CONTENT SIZE   EXTRA
 
 nginx:alpine   1d13701a5f9f       92.6MB         26.7MB    
 
-
+```
 
 #### Просмотр истории слоев образа
+
+```
  docker history nginx:alpine
 
 IMAGE          CREATED       CREATED BY                                      SIZE      COMMENT
@@ -148,19 +153,20 @@ IMAGE          CREATED       CREATED BY                                      SIZ
 
 <missing>      5 weeks ago   ADD alpine-minirootfs-3.23.3-aarch64.tar.gz …   9.36MB    buildkit.dockerfile.v0
 
-
+```
 
 #### Удаление образа
+```
 docker rmi nginx:alpine 
 
 Untagged: nginx:alpine
 
 Deleted: sha256:1d13701a5f9f3fb01aaa88cef2344d65b6b5bf6b7d9fa4cf0dca557a8d7702ba
-
+```
 
 
 #### Скачивание образа PostgreSQL версии 15
-
+```
 docker pull postgres:15-alpine
 
 15-alpine: Pulling from library/postgres
@@ -180,9 +186,11 @@ a760e82798cc: Pull complete
 Digest: sha256:fceb6f86328c36f2438fae3b851b0cc57c4a7e69a58c866d9ce24281f2cf0c9c
 Status: Downloaded newer image for postgres:15-alpine
 docker.io/library/postgres:15-alpine
-
+```
 
 #### Скачивание образа golang версии 1.21
+
+```
 docker pull golang:1.21-alpine
 
 1.21-alpine: Pulling from library/golang
@@ -197,10 +205,10 @@ b6a4ffdacca7: Download complete
 Digest: sha256:2414035b086e3c42b99654c8b26e6f5b1b1598080d65fd03c7f499552ff4dc94
 Status: Downloaded newer image for golang:1.21-alpine
 docker.io/library/golang:1.21-alpine
-
+```
 
 #### Просмотр образов 
-
+```
 docker images
 
                               i Info →   U  In Use
@@ -245,7 +253,7 @@ docker run --name postgres15 \
 b3bec486ed63719afabc74853e472b989e1a6839bb098329ef53283359a9cc82
 
  docker exec -it postgres15 sh
-
+```
 #### Работа с томами (Volumes)
 
 ![ Работа с томами 1](screenshots/Работа_с_томами.png)

@@ -3,10 +3,11 @@ name: Validate Kubernetes Manifest
 on:
   push:
     paths:
-      - 'k8s/*.yaml'
+      - 'k8s/**/*.yaml'
+      - '.github/workflows/*.yml'
   pull_request:
     paths:
-      - 'k8s/*.yaml'
+      - 'k8s/**/*.yaml'
 
 jobs:
   validate:

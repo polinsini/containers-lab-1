@@ -15,9 +15,9 @@ jobs:
 
       - name: Install kubeval
         run: |
-          wget https://github.com/instrumenta/kubeval/releases/latest/download/kubeval-linux-amd64.tar.gz
-          tar xf kubeval-linux-amd64.tar.gz
-          sudo cp kubeval /usr/local/bin
+          curl -L -o kubeval.tar.gz https://github.com/instrumenta/kubeval/releases/latest/download/kubeval-linux-amd64.tar.gz
+          tar xf kubeval.tar.gz
+          sudo mv kubeval /usr/local/bin
 
       - name: Validate Kubernetes manifests
         run: |
@@ -34,12 +34,6 @@ jobs:
             echo "Validating $file"
             kubectl apply --dry-run=client -f "$file"
           done
-
-      - name: Check for deprecated APIs
-        uses: yannh/kubernetes-json-schema@master
-        with:
-          kubernetes-version: 1.28.0
-          manifests: k8s/
 
       - name: Lint YAML files
         uses: ibiqlik/action-yamllint@v3

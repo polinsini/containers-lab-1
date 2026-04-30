@@ -20,5 +20,5 @@ jobs:
       run: |
         for file in k8s/*.yaml; do
           echo "Checking $file"
-          python3 -c "import yaml; yaml.safe_load(open('$file'))"
+          python3 -c "import yaml; list(yaml.safe_load_all(open('$file')))"
         done

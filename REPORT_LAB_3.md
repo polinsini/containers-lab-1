@@ -48,34 +48,29 @@ root@k8s-master:~/k8s-lab3# cat /etc/containerd/config.toml | grep SystemdCgroup
 ```
 root@k8s-master:~/k8s-lab3# kubeadm version
 kubeadm version: &version.Info{Major:"1", Minor:"28", GitVersion:"v1.28.15", GitCommit:"841856557ef0f6a399096c42635d114d6f2cf7f4", GitTreeState:"clean", BuildDate:"2024-10-22T20:33:16Z", GoVersion:"go1.22.8", Compiler:"gc", Platform:"linux/arm64"}
-root@k8s-master:~/k8s-lab3# kubelet --version
-Kubernetes v1.28.15
-root@k8s-master:~/k8s-lab3# kubectl version --client
-Client Version: v1.28.15
-Kustomize Version: v5.0.4-0.20230601165947-6ce0bf390ce3
 ```
 ### 4. Инициализация кластера
 #### 4.1 Узлы кластера
 ```
 root@k8s-master:~/k8s-lab3# kubectl get nodes -o wide
-NAME          STATUS   ROLES           AGE    VERSION    INTERNAL-IP   EXTERNAL-IP   OS-IMAGE                         KERNEL-VERSION   CONTAINER-RUNTIME
-k8s-master    Ready    control-plane   2d6h   v1.28.15   10.0.0.1      <none>        Debian GNU/Linux 12 (bookworm)   6.1.0-44-arm64   containerd://2.2.2
-k8s-worker1   Ready    worker          2d6h   v1.28.15   10.0.0.2      <none>        Debian GNU/Linux 12 (bookworm)   6.1.0-44-arm64   containerd://2.2.2
-k8s-worker2   Ready    worker          151m   v1.28.15   10.0.0.3      <none>        Debian GNU/Linux 12 (bookworm)   6.1.0-44-arm64   containerd://2.2.2
+NAME          STATUS     ROLES           AGE   VERSION    INTERNAL-IP   EXTERNAL-IP   OS-IMAGE                         KERNEL-VERSION   CONTAINER-RUNTIME
+k8s-master    Ready      control-plane   83m   v1.28.15   10.0.0.1      <none>        Debian GNU/Linux 12 (bookworm)   6.1.0-44-arm64   containerd://2.2.2
+k8s-worker1   NotReady   <none>          70m   v1.28.15   10.0.0.2      <none>        Debian GNU/Linux 12 (bookworm)   6.1.0-44-arm64   containerd://2.2.2
+k8s-worker2   Ready      <none>          71m   v1.28.15   10.0.0.3      <none>        Debian GNU/Linux 12 (bookworm)   6.1.0-44-arm64   containerd://2.2.2
 ```
 #### 4.2 Поды в namespace kube-system
 ```
 root@k8s-master:~/k8s-lab3# kubectl get pods -n kube-system
 NAME                                 READY   STATUS    RESTARTS   AGE
-coredns-5dd5756b68-98fvh             1/1     Running   0          2d6h
-coredns-5dd5756b68-b64d7             1/1     Running   0          2d6h
-etcd-k8s-master                      1/1     Running   0          2d6h
-kube-apiserver-k8s-master            1/1     Running   0          2d6h
-kube-controller-manager-k8s-master   1/1     Running   3          2d6h
-kube-proxy-gm9dw                     1/1     Running   0          2d6h
-kube-proxy-pxpvj                     1/1     Running   0          151m
-kube-proxy-r8n96                     1/1     Running   0          2d6h
-kube-scheduler-k8s-master            1/1     Running   3          2d6h
+coredns-5dd5756b68-2gq6t             1/1     Running   0          82m
+coredns-5dd5756b68-p5rck             1/1     Running   0          82m
+etcd-k8s-master                      1/1     Running   0          83m
+kube-apiserver-k8s-master            1/1     Running   0          83m
+kube-controller-manager-k8s-master   1/1     Running   0          83m
+kube-proxy-8k52q                     1/1     Running   0          70m
+kube-proxy-k68h6                     1/1     Running   0          82m
+kube-proxy-vskc2                     1/1     Running   0          71m
+kube-scheduler-k8s-master            1/1     Running   0          83m
 ```
 ### 5. Сетевые компоненты
 #### 5.1 Calico
@@ -88,48 +83,57 @@ calico-node-ng7cs                          0/1     Init:2/3   0             37s
 ```
 #### 5.2 MetalLB
 ```
-user@k8s-master:~$ kubectl get pods -n metallb-system
+root@k8s-master:~/k8s-lab3# kubectl get pods -n metallb-system
 NAME                          READY   STATUS    RESTARTS   AGE
-controller-5c6b6c8447-26vcv   1/1     Running   0          2m23s
-speaker-7hw7h                 1/1     Running   0          2m23s
-speaker-jnh28                 1/1     Running   0          2m23s
-speaker-xtbqm                 1/1     Running   0          2m23s
+controller-5c6b6c8447-ccjxp   1/1     Running   0          4m12s
+speaker-5lksj                 1/1     Running   0          66m
+speaker-82kqh                 1/1     Running   0          66m
+speaker-c8ztm                 1/1     Running   0          66m
 ```
 #### 5.3 Ingress Controller
 ```
-user@k8s-master:~$ kubectl get pods -n ingress-nginx
+root@k8s-master:~/k8s-lab3# kubectl get pods -n ingress-nginx
 NAME                                        READY   STATUS      RESTARTS   AGE
-ingress-nginx-admission-create-j9tjg        0/1     Completed   0          2m20s
-ingress-nginx-admission-patch-bzprs         0/1     Completed   0          2m20s
-ingress-nginx-controller-6dc9c5fb7c-7sdm9   1/1     Running     0          2m20s
+ingress-nginx-admission-patch-ttkfc         0/1     Completed   2          66m
+ingress-nginx-controller-6dc9c5fb7c-tqcc5   1/1     Running     0          66m
 ```
 ### 6. Развернутое приложение
 #### 6.1 Все ресурсы в namespace lab3-app
 ```
 root@k8s-master:~/k8s-lab3# kubectl get all -n lab3-app
-NAME                            READY   STATUS    RESTARTS       AGE
-pod/go-app-57cccf7c85-jrbdb     1/1     Running   1 (108m ago)   153m
-pod/go-app-57cccf7c85-n46hg     1/1     Running   1 (108m ago)   153m
-pod/go-app-57cccf7c85-wh5dc     1/1     Running   4 (109m ago)   34h
-pod/nginx-7fdcf7c4f8-7b8j4      1/1     Running   0              34h
-pod/nginx-7fdcf7c4f8-bl68s      1/1     Running   0              153m
-pod/postgres-6d75f85ccf-x27vn   1/1     Running   0              153m
+NAME                            READY   STATUS        RESTARTS   AGE
+pod/go-app-57dff6c47c-7vmh2     1/1     Running       0          47m
+pod/go-app-57dff6c47c-c62wc     1/1     Terminating   0          47m
+pod/go-app-57dff6c47c-fzjgb     1/1     Running       0          3m36s
+pod/go-app-57dff6c47c-qhdmk     1/1     Running       0          3m36s
+pod/go-app-57dff6c47c-vxz64     1/1     Terminating   0          47m
+pod/nginx-75ffb98c97-f22nh      1/1     Terminating   0          12m
+pod/nginx-75ffb98c97-fmjt9      1/1     Running       0          12m
+pod/nginx-75ffb98c97-x669k      1/1     Running       0          3m36s
+pod/postgres-6d75f85ccf-qc9m4   1/1     Running       0          7m10s
 
 NAME               TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)    AGE
-service/go-app     ClusterIP   10.102.43.161    <none>        8081/TCP   34h
-service/nginx      ClusterIP   10.108.219.186   <none>        80/TCP     20m
-service/postgres   ClusterIP   10.99.40.104     <none>        5432/TCP   34h
+service/go-app     ClusterIP   10.110.205.78    <none>        8080/TCP   59m
+service/nginx      ClusterIP   10.110.225.157   <none>        80/TCP     39m
+service/postgres   ClusterIP   10.99.187.147    <none>        5432/TCP   59m
 
 NAME                       READY   UP-TO-DATE   AVAILABLE   AGE
-deployment.apps/go-app     3/3     3            3           34h
-deployment.apps/nginx      2/2     2            2           34h
-deployment.apps/postgres   1/1     1            1           34h
+deployment.apps/go-app     3/3     3            3           59m
+deployment.apps/nginx      2/2     2            2           59m
+deployment.apps/postgres   1/1     1            1           59m
 
 NAME                                  DESIRED   CURRENT   READY   AGE
-replicaset.apps/go-app-57cccf7c85     3         3         3       34h
-replicaset.apps/go-app-6b88cd4db9     0         0         0       34h
-replicaset.apps/nginx-7fdcf7c4f8      2         2         2       34h
-replicaset.apps/postgres-6d75f85ccf   1         1         1       34h
+replicaset.apps/go-app-5686ddbdfc     0         0         0       56m
+replicaset.apps/go-app-568b5859bb     0         0         0       48m
+replicaset.apps/go-app-57dff6c47c     3         3         3       47m
+replicaset.apps/go-app-6b88cd4db9     0         0         0       59m
+replicaset.apps/go-app-c5bf6749f      0         0         0       56m
+replicaset.apps/nginx-674646f887      0         0         0       27m
+replicaset.apps/nginx-75ffb98c97      2         2         2       12m
+replicaset.apps/nginx-785546bf7d      0         0         0       21m
+replicaset.apps/nginx-7fdcf7c4f8      0         0         0       59m
+replicaset.apps/postgres-6d75f85ccf   1         1         1       59m
+
 ```
 
 #### 6.2 PersistentVolumeClaim
@@ -141,68 +145,24 @@ postgres-pvc   Bound    pvc-4bcbd4d7-0971-4fa9-acac-2e5040dba54b   5Gi        RW
 ### 7. Скриншоты
 #### 7.1 Главная страница приложения
 ![Главная страница](screenshots/3/1.png)
+
 #### 7.2 Список пользователей из БД
-![Users list](screenshots/3/2.png)
+![Users list](screenshots/3/6.png)
+
 ### 8. Тестирование отказоустойчивости
 #### 8.1 Симуляция отказа узла
-```
-root@k8s-worker1:~# systemctl stop kubelet
 
-^Croot@k8s-master:~/k8s-lab3# kubectl get nodes -w
-NAME          STATUS     ROLES           AGE    VERSION
-k8s-master    Ready      control-plane   2d8h   v1.28.15
-k8s-worker1   NotReady   worker          2d8h   v1.28.15
-k8s-worker2   Ready      worker          4h     v1.28.15
+![stop worker](screenshots/3/3.png)
 
-root@k8s-master:~/k8s-lab3# kubectl get pods -n lab3-app -o wide -w
-NAME                        READY   STATUS        RESTARTS   AGE     IP              NODE          NOMINATED NODE   READINESS GATES
-go-app-57cccf7c85-42z4z     1/1     Running       0          7m11s   10.244.126.3    k8s-worker2   <none>           <none>
-go-app-57cccf7c85-bc7jx     1/1     Running       0          7m11s   10.244.126.4    k8s-worker2   <none>           <none>
-go-app-57cccf7c85-gg24g     1/1     Terminating   0          7m11s   10.244.194.84   k8s-worker1   <none>           <none>
-go-app-57cccf7c85-vr67h     1/1     Running       0          28s     10.244.126.8    k8s-worker2   <none>           <none>
-nginx-7fdcf7c4f8-5z658      1/1     Running       0          28s     10.244.126.10   k8s-worker2   <none>           <none>
-nginx-7fdcf7c4f8-6k2z8      1/1     Running       0          28s     10.244.126.11   k8s-worker2   <none>           <none>
-nginx-7fdcf7c4f8-7b8j4      1/1     Terminating   0          35h     10.244.194.76   k8s-worker1   <none>           <none>
-nginx-7fdcf7c4f8-bl68s      1/1     Terminating   0          4h6m    10.244.194.79   k8s-worker1   <none>           <none>
-postgres-6d75f85ccf-jfhvq   1/1     Running       0          14s     10.244.126.12   k8s-worker2   <none>           <none>
-```
+
 #### 8.2 Проверка сохранности данных
-```
-root@k8s-master:~/k8s-lab3# kubectl delete pod -n lab3-app -l app=postgres
-pod "postgres-6d75f85ccf-zmfdx" deleted
-root@k8s-master:~/k8s-lab3# kubectl get pods -n lab3-app -o wide -w
-NAME                        READY   STATUS        RESTARTS   AGE     IP              NODE          NOMINATED NODE   READINESS GATES
-go-app-57cccf7c85-42z4z     1/1     Running       0          7m11s   10.244.126.3    k8s-worker2   <none>           <none>
-go-app-57cccf7c85-bc7jx     1/1     Running       0          7m11s   10.244.126.4    k8s-worker2   <none>           <none>
-go-app-57cccf7c85-gg24g     1/1     Terminating   0          7m11s   10.244.194.84   k8s-worker1   <none>           <none>
-go-app-57cccf7c85-vr67h     1/1     Running       0          28s     10.244.126.8    k8s-worker2   <none>           <none>
-nginx-7fdcf7c4f8-5z658      1/1     Running       0          28s     10.244.126.10   k8s-worker2   <none>           <none>
-nginx-7fdcf7c4f8-6k2z8      1/1     Running       0          28s     10.244.126.11   k8s-worker2   <none>           <none>
-nginx-7fdcf7c4f8-7b8j4      1/1     Terminating   0          35h     10.244.194.76   k8s-worker1   <none>           <none>
-nginx-7fdcf7c4f8-bl68s      1/1     Terminating   0          4h6m    10.244.194.79   k8s-worker1   <none>           <none>
-postgres-6d75f85ccf-jfhvq   1/1     Running       0          14s     10.244.126.12   k8s-worker2   <none>           <none>
-^Croot@k8s-master:~/k8s-lab3kubectl delete pod -n lab3-app -l app=postgreses
-pod "postgres-6d75f85ccf-jfhvq" deleted
-root@k8s-master:~/k8s-lab3# kubectl get pods -n lab3-app -o wide -w
-NAME                        READY   STATUS        RESTARTS   AGE     IP              NODE          NOMINATED NODE   READINESS GATES
-go-app-57cccf7c85-42z4z     1/1     Running       0          7m44s   10.244.126.3    k8s-worker2   <none>           <none>
-go-app-57cccf7c85-bc7jx     1/1     Running       0          7m44s   10.244.126.4    k8s-worker2   <none>           <none>
-go-app-57cccf7c85-gg24g     1/1     Terminating   0          7m44s   10.244.194.84   k8s-worker1   <none>           <none>
-go-app-57cccf7c85-vr67h     1/1     Running       0          61s     10.244.126.8    k8s-worker2   <none>           <none>
-nginx-7fdcf7c4f8-5z658      1/1     Running       0          61s     10.244.126.10   k8s-worker2   <none>           <none>
-nginx-7fdcf7c4f8-6k2z8      1/1     Running       0          61s     10.244.126.11   k8s-worker2   <none>           <none>
-nginx-7fdcf7c4f8-7b8j4      1/1     Terminating   0          35h     10.244.194.76   k8s-worker1   <none>           <none>
-nginx-7fdcf7c4f8-bl68s      1/1     Terminating   0          4h6m    10.244.194.79   k8s-worker1   <none>           <none>
-postgres-6d75f85ccf-pbg7g   1/1     Running       0          1s      10.244.126.13   k8s-worker2   <none>           <none>
-^Croot@k8s-master:~/k8s-lab3# kubectexec -it -n lab3-app deployment/postgres -- psql -U postgres -d myapp -c "SELECT * FROM users;"
- id |        name        |         created_at
-----+--------------------+----------------------------
-  1 | Production Cluster | 2026-03-29 09:56:19.225065
-  2 | kubeadm User       | 2026-03-29 09:56:19.225065
-  3 | Calico Network     | 2026-03-29 09:56:19.225065
-  4 | MetalLB User       | 2026-03-29 09:56:19.225065
-(4 rows)
-```
+
+![delete postgres](screenshots/3/4.png)
+![проверка delete postgres](screenshots/3/5.png)
+![проверка таблицы в postgres](screenshots/3/6.png)
+
+
+
 ### 9. Ответы на контрольные вопросы
 1. **Какие компоненты входят в control plane и какова их роль?**
    - **kube-apiserver** — центральная точка входа в кластер (REST API), аутентификация/авторизация, валидация объектов, запись/чтение состояния.
